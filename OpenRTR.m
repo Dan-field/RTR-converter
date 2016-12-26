@@ -2,7 +2,7 @@
 filename = "PR100/estate5m-01.rtr";
 fid = fopen(filename);
 % --- EXPERIMENTAL ---
-Data = fread(fid, [512, Inf], "uint32", 1);
-% result looks more like a tract if the SKIP value (4th argument) is odd
+Data = fread(fid, [512, Inf], "uint16");
 fclose(fid);
-plot(Data(50,:));
+Selection = reshape(dec2hex(Data([1:16],[501:516])),32,32);
+% plot(Data(50,:));
