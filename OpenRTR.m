@@ -1,32 +1,38 @@
-% Open a specific file, then read it as a binary file.
+% Open a specific file, then read it as 16-bit unsigned integers.
 filename = "PR100/estate5m-01.rtr";
 fid = fopen(filename);
-% --- EXPERIMENTAL ---
 data = fread(fid, [512, Inf], "uint16");
 fclose(fid);
+% select a smaller block that is known to contain values, for experimentation
+% Note: this is specific to the file
+% block of 16x16 values
 selection = data([1:16],[501:516]);
+% take just the first line of the block (16 x 16-bit integers)
 first = selection(1,:);
+% create a vector containing 16 x 16-bit zeros
 container = zeros(1, 16);
-for(i = 1:14)
-  container(1) = bitset(container(1), (15-i), bitget(first(1), 15-i));
+% cycle the first-line values into the container, taking only the
+% 14 least significant bits (and leaving the two MSB's as zero)
+% note bit 1 = LSB
+% First, set up some counters
+for(position = 1:8)
+  if(position != 1)
+    for(i = 1:(position-1)*2)
+      container(position) = bitset(container(position), ((2*position)-1-i), bitget(first(position-1), 17-i));
+    endfor
+  endif
+  if(position != 8)
+    for(i = 1:(8-position)*2)
+      container(position) = bitset(container(position), (15-i), bitget(first(position), 17-(2*position)-i));
+    endfor
+  endif
 endfor
-for(i = 1:2)
-  container(2) = bitset(container(2), (3-i), bitget(first(1), 17-i));
-endfor
-for(i = 1:12)
-  container(2) = bitset(container(2), (15-i), bitget(first(2), 13-i));
-endfor
-for(i = 1:4)
-  container(3) = bitset(container(3), (5-i), bitget(first(2), 17-i));
-endfor
-for(i = 1:10)
-  container(3) = bitset(container(3), (15-i), bitget(first(3), 11-i));
-endfor
-printf("14-bit values: ")
-bitget(container(1), [1:16])
-bitget(container(2), [1:16])
-bitget(container(3), [1:16])
-printf("16-bit originals: ")
-bitget(first(1), [1:16])
-bitget(first(2), [1:16])
-bitget(first(3), [1:16])
+% display the binary values for manual checking of the result
+printf("14-bit position 8: ")
+%for(i = 4:8)
+  bitget(container(8), [1:16])
+%endfor
+printf("16-bit position 7: ")
+%for(i = 4:8)
+  bitget(first(7), [1:16])
+%endfor
