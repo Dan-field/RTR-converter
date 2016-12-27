@@ -14,7 +14,8 @@ container = zeros(1, 16);
 % cycle the first-line values into the container, taking only the
 % 14 least significant bits (and leaving the two MSB's as zero)
 % note bit 1 = LSB
-% First, set up some counters
+
+%---------- Loop to write 8 x 14-bit values from 7 x 16-bit values ---------
 for(position = 1:8)
   if(position != 1)
     for(i = 1:(position-1)*2)
@@ -27,12 +28,3 @@ for(position = 1:8)
     endfor
   endif
 endfor
-% display the binary values for manual checking of the result
-printf("14-bit position 8: ")
-%for(i = 4:8)
-  bitget(container(8), [1:16])
-%endfor
-printf("16-bit position 7: ")
-%for(i = 4:8)
-  bitget(first(7), [1:16])
-%endfor
